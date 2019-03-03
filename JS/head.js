@@ -11,7 +11,7 @@ registrys = {
             "ci":26375969, 
             "name":"Leonardo", 
             "lastName":"Baron", 
-            "Address":"Por ahi"
+            "Address":"Paaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         },
         {
             "ci":27260666,
@@ -75,4 +75,4 @@ registrys = {
         },
     ]
 }
-pageSize = 6
+pageSize = 5

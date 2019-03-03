@@ -1,11 +1,9 @@
 
 body{
-    background-color: teal;
-    
+    background-color: teal;  
 }
-grid-table{
+#grid{
     position: absolute;
-    width: 800px;
-    height: 700px;
+    
 }
 

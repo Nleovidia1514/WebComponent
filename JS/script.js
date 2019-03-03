@@ -4,8 +4,9 @@ const getStyle = ()=>{
     #container{
         width: 700px;
         height: 400px;
+        border-radius: 50px;
         background-color: white;
-        border-style: groove;
+        border-style: outset;
         border-color: orange;
         border-width: 10px;
         text-align: center;
@@ -14,9 +15,13 @@ const getStyle = ()=>{
         min-width: 200px;
         min-height: 300px;
         resize: both;
-        overflow: auto;
+        overflow: hidden;
     }
     .title{
+        border-top-left-radius: 710px;
+        border-top-right-radius: 710px;
+        font-size: 35px;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
         width: 99%;
         height: 10%;
         border-style: dotted;
@@ -33,7 +38,8 @@ const getStyle = ()=>{
     }
     th{
         height: 20%;
-        width: 25%;
+        resize: horizontal;
+        overflow: auto;
         text-align: center;
         background-color: olivedrab;
     }
@@ -43,7 +49,19 @@ const getStyle = ()=>{
     td{
         background-color: inherit;
     }
+    textarea{
+        width: 100%;
+        height: 100%;
+        background-color: inherit;
+        text-align: center;
+        vertical-align: center;
+        resize: none;
+        overflow: auto;
+        border: none;
+    }
     #controlPanel{
+        border-bottom-right-radius: 700px;
+        border-bottom-left-radius: 700px;
         width: 100%;
         height: 11%;
         background-color: grey;
@@ -55,14 +73,32 @@ const getStyle = ()=>{
         margin-right: 10px;
         margin-top: 4px;
         cursor: pointer;
+        
     }
 
     #pgSelect{
-        width: 5%;
+        position: relative;
+        display: inline-block;
+        width: 15%;
+        height: 50%;
+        top: -17%;
+        float: none;
+        left: -5%;      
+    }
+
+    #pgNumeric{
         position: absolute;
-        margin-left: 1.5%;
-        margin-top: 1.5%;
-        left: 10px;
+        width: 50%;
+        height: 100%;
+        top: 50%;
+        left: 50%;
+    }
+
+    p{
+        position: relative:
+        top: 0px;
+        left: -10px;
+        width: 50%;
     }
 
     @keyframes highlight{
@@ -70,7 +106,8 @@ const getStyle = ()=>{
         to { border: 1px solid cyan}
     }
     .control:hover{
-        animation: highlight 1.5s;     
+        animation: highlight 1.5s; 
+        animation-fill-mode: forwards;    
     }`;
 }
 
@@ -102,13 +139,19 @@ class Controls extends HTMLElement{
         priorBtn.src = "IMAGES/priorBtn.png";
         const nextBtn = new Image();
         nextBtn.src = "IMAGES/nextBtn.png";
+        const p = document.createElement("p");
+        p.innerHTML = "PAGE#";
+        const pg = document.createElement("div");
+        pg.id = "pgSelect";
         const pageSelector = document.createElement("input");
+        pageSelector.id = "pgNumeric";
         pageSelector.type = "number";
         pageSelector.value = 1;
         pageSelector.min = 1;
         pageSelector.max = this.table.itemPage.length;
-        pageSelector.id = "pgSelect";
-        div.appendChild(pageSelector);
+        pg.appendChild(p);
+        pg.appendChild(pageSelector);
+        div.appendChild(pg);
         buttons.push(firstBtn);
         buttons.push(rwdBtn);
         buttons.push(priorBtn);
@@ -118,11 +161,16 @@ class Controls extends HTMLElement{
         buttons.forEach(button => {
             button.classList.add("control");
             div.appendChild(button);
-        });     
-        this.addEvents(buttons);    
+        }); 
+        this.addEvents(buttons, pageSelector);    
     }
 
-    addEvents(buttons){
+    addEvents(buttons, pageSelector){
+        pageSelector.addEventListener("keyup",(e)=>{
+            if(e.key == "Enter"){
+                this.movePage(pageSelector.value-1);
+            }
+        })
         buttons.forEach(control => {
             control.onmousedown = 
             control.addEventListener("mousedown",(e)=>{
@@ -202,7 +250,8 @@ class Controls extends HTMLElement{
     }
 
     movePage(itemPage){
-        this.table.currentPage = itemPage
+        this.table.currentPage = itemPage;
+        this.sR.getElementById("pgNumeric").value = this.table.currentPage + 1;
         var tableHtml = "";
         var tableHeaders = "<tr>";
         for (const column in this.table.headers) {
@@ -213,7 +262,7 @@ class Controls extends HTMLElement{
             tableHtml = tableHtml.concat(`<tr id=r${register.registryPos}>`);
             for (const data in register) {    
                 if (data != "registryPos") {
-                    tableHtml = tableHtml.concat(`<td contenteditable>${register[data]}</td>`);     
+                    tableHtml = tableHtml.concat(`<td><textarea>${register[data]}</textarea></td>`);     
                 }
             }
             tableHtml = tableHtml.concat("</tr>"); 
@@ -326,7 +375,7 @@ class Grid extends HTMLElement {
             tableHtml = tableHtml.concat(`<tr id=r${register.registryPos}>`);
             for (const data in register) {    
                 if (data != "registryPos") {
-                    tableHtml = tableHtml.concat(`<td contenteditable>${register[data]}</td>`);     
+                    tableHtml = tableHtml.concat(`<td><textarea>${register[data]}</textarea></td>`);     
                 }
             }
             tableHtml = tableHtml.concat("</tr>"); 
