@@ -1,6 +1,5 @@
 const getStyle = ()=>{
-    return `
-    
+    return `   
     #container{
         width: 700px;
         height: 400px;
@@ -108,6 +107,27 @@ const getStyle = ()=>{
     .control:hover{
         animation: highlight 1.5s; 
         animation-fill-mode: forwards;    
+    }
+    #closeBtn{
+        outline: none;
+        position: absolute;
+        border-top-right-radius: 400px;
+        height: 10.5%;
+        width: 20%;
+        max-width: 20%;
+        min-width: 5%;
+        top: 2.5%;
+        right: 10px;
+        color: black;
+        font-size: 30px;
+        text-align: start;
+        overflow: hidden;
+        
+    }
+    #closeBtn:hover{
+        color: white;
+        background-color: tomato;
+        transition-duration: 0.1s;
     }`;
 }
 
@@ -152,6 +172,10 @@ class Controls extends HTMLElement{
         pg.appendChild(p);
         pg.appendChild(pageSelector);
         div.appendChild(pg);
+        const closeBtn = document.createElement("button");
+        closeBtn.innerHTML = "X";
+        closeBtn.id = "closeBtn";
+        this.table.sR.getElementById("container").appendChild(closeBtn);
         buttons.push(firstBtn);
         buttons.push(rwdBtn);
         buttons.push(priorBtn);
@@ -162,10 +186,17 @@ class Controls extends HTMLElement{
             button.classList.add("control");
             div.appendChild(button);
         }); 
-        this.addEvents(buttons, pageSelector);    
+        this.addEvents(buttons, pageSelector, closeBtn);    
     }
 
-    addEvents(buttons, pageSelector){
+    addEvents(buttons, pageSelector, closeBtn){
+        this.table.sR.getElementById("container").addEventListener("resize",(e)=>{
+            
+            console.log("hello")
+        })
+        closeBtn.addEventListener("click",(e)=>{
+            this.table.remove();
+        })
         pageSelector.addEventListener("keyup",(e)=>{
             if(e.key == "Enter"){
                 this.movePage(pageSelector.value-1);
