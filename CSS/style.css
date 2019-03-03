@@ -1,0 +1,11 @@
+
+body{
+    background-color: teal;
+    
+}
+grid-table{
+    position: absolute;
+    width: 800px;
+    height: 700px;
+}
+
