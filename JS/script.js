@@ -30,6 +30,7 @@ const getStyle = ()=>{
         background-color: aquamarine;
         margin-top: 0%;
         margin-bottom: 0%;
+        cursor: move;
     }
     table{
         position: sticky;
@@ -72,8 +73,7 @@ const getStyle = ()=>{
         border: 1px solid grey;
         margin-right: 10px;
         margin-top: 4px;
-        cursor: pointer;
-        
+        cursor: pointer; 
     }
 
     #pgSelect{
