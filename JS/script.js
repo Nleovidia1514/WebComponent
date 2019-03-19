@@ -460,8 +460,7 @@ class Grid extends HTMLElement {
         div.appendChild(title);
     }
 
-    createTable(tbody){
-        var pageNmbr = 0;      
+    createTable(tbody){    
         this.itemPage.slice(0, this.pageSize).forEach(register => {
             let tr = document.createElement("tr");
             tr.id = "r" + register.registryPos;
@@ -511,16 +510,25 @@ class Grid extends HTMLElement {
         srchField.style.position = "absolute";
         srchField.style.width = "20%";
         srchField.style.top = "7.5%";
-        srchField.style.left = "20px";      
+        srchField.style.left = "20px";  
+        srchField.addEventListener("change", e => {
+            let register = searchRegistry(this.registrys, parseInt(srchField.value));
+            let page = (register.registryPos + 1) / this.pageSize;  
+            page = (page % 1 != 0 && page % 1 < 0.5) ? Math.round(page) + 1 : Math.round(page); 
+            controlsTag.movePage(page-1);
+            console.log(page);
+            let row = this.sR.getElementById(`r${register.registryPos}`);
+            controlsTag.selectRow(row);
+        })    
         for (const column in this.headers) {
             let th = this.sR.getElementById(column);
-            th.addEventListener("mousedown",(e)=>{
+            th.addEventListener("mousedown", e =>{
                 th.style.border = "inset";
-                document.body.addEventListener("click",(e)=>{
+                document.body.addEventListener("click", e =>{
                     th.style.border = "outset";
                 })
             })
-            th.addEventListener("click",(e)=>{
+            th.addEventListener("click", e =>{
                 th.style.border = "outset";
             })
         }
@@ -587,6 +595,15 @@ function search(array, pos){
     return null;
 }
 
+function searchRegistry(array, id){
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if(element.ci == id){
+            return element;
+        }
+    }
+    return null;
+}
 try {
         customElements.define("grid-table", Grid)
         customElements.define("grid-controls", Controls);
