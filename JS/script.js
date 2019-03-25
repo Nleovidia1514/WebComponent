@@ -197,17 +197,17 @@ class Controls extends HTMLElement{
     }
 
     addEvents(buttons, pageSelector, closeBtn){
-        closeBtn.addEventListener("click",(e)=>{
+        closeBtn.addEventListener("click",e =>{
             this.table.remove();
         })
-        pageSelector.addEventListener("keyup",(e)=>{
+        pageSelector.addEventListener("keyup",e =>{
             if(e.key == "Enter"){
                 this.movePage(pageSelector.value-1);
             }
         })
         buttons.forEach(control => {
             control.onmousedown = 
-            control.addEventListener("mousedown",(e)=>{
+            control.addEventListener("mousedown",e =>{
                 e.preventDefault();
                 document.body.addEventListener("click",()=>{
                     control.style.transform = "translateY(0px)";
@@ -215,19 +215,19 @@ class Controls extends HTMLElement{
                 control.style.transform = "translateY(2px)"
             });      
         });
-        buttons[0].addEventListener("click",(e)=>{
+        const moveToFirstPage = e =>{
             this.movePage(0);
             let row = this.table.sR.getElementById("r0");
             this.selectRow(row);
-        })
-        buttons[1].addEventListener("click",(e)=>{
+        }
+        const moveToPrevPage = e =>{
             if(this.table.currentPage != 0){
                 this.movePage(--this.table.currentPage);
                 let row = this.table.sR.getElementById(`r${this.table.itemPage[this.table.currentPage*this.table.pageSize].registryPos}`);
                 this.selectRow(row);
             }        
-        })
-        buttons[2].addEventListener("click",(e)=>{
+        }
+        const prevRegister = e =>{
             if (this.table.currentPage != 0 
                 && this.table.selectedRow == this.table.currentPage * this.table.pageSize) {
                 this.movePage(--this.table.currentPage);
@@ -237,9 +237,10 @@ class Controls extends HTMLElement{
                 let row = this.table.sR.getElementById(`r${this.table.selectedRow - 1}`);
                 this.selectRow(row);
             }   
-        })
-        buttons[3].addEventListener("click",(e)=>{
-            let lastPage = ((this.table.itemPage.length/this.table.pageSize) % 1 > 0.5) ? parseInt(this.table.itemPage.length/this.table.pageSize) : ((this.table.itemPage.length/this.table.pageSize) % 1 == 0) ? this.table.itemPage.length/this.table.pageSize : parseInt(this.table.itemPage.length/this.table.pageSize)+1;
+        }
+        const nextRegister = e =>{
+            let x = this.table.numberOfRegistrys / this.table.pageSize;
+            let lastPage = (x % 1 == 0) ? x : Math.floor(x) + 1;
             if (this.table.currentPage != lastPage - 1
                 && this.table.selectedRow == this.table.currentPage*this.table.pageSize + this.table.pageSize - 1) {
                 this.movePage(++this.table.currentPage);
@@ -249,24 +250,26 @@ class Controls extends HTMLElement{
                 let row = this.table.sR.getElementById(`r${this.table.selectedRow +1}`);
                 this.selectRow(row);
             }   
-        })
-        buttons[4].addEventListener("click",(e)=>{
-            let lastPage = ((this.table.itemPage.length/this.table.pageSize) % 1 > 0.5) ? parseInt(this.table.itemPage.length/this.table.pageSize) : ((this.table.itemPage.length/this.table.pageSize) % 1 == 0) ? this.table.itemPage.length/this.table.pageSize : parseInt(this.table.itemPage.length/this.table.pageSize)+1;
+        }
+        const moveToNextPage = e =>{
+            let x = this.table.numberOfRegistrys / this.table.pageSize;
+            let lastPage = (x % 1 == 0) ? x : Math.floor(x) + 1;
             if(this.table.currentPage != lastPage-1){
                 this.movePage(++this.table.currentPage);
                 let row = this.table.sR.getElementById(`r${this.table.itemPage[this.table.currentPage*this.table.pageSize].registryPos}`);
                 this.selectRow(row);
             }  
-        })
-        buttons[5].addEventListener("click",(e)=>{
-            let lastPage = ((this.table.itemPage.length/this.table.pageSize) % 1 > 0.5) ? parseInt(this.table.itemPage.length/this.table.pageSize) : ((this.table.itemPage.length/this.table.pageSize) % 1 == 0) ? this.table.itemPage.length/this.table.pageSize : parseInt(this.table.itemPage.length/this.table.pageSize)+1;
+        } 
+        const moveToLastPage = e =>{
+            let x = this.table.numberOfRegistrys / this.table.pageSize;
+            let lastPage = (x % 1 == 0) ? x : Math.floor(x) + 1;
             this.movePage(lastPage-1);
             let row = this.table.sR.getElementById(`r${this.table.numberOfRegistrys-1}`);
             console.log(this.table.numberOfRegistrys)
             this.selectRow(row);
             
-        })
-        buttons[6].addEventListener("click",(e) => {
+        }
+        const addRegister = e => {
             const newObj = {
                 ci: "",
                 name: "",
@@ -274,27 +277,71 @@ class Controls extends HTMLElement{
                 Address: "",
                 registryPos: this.table.numberOfRegistrys++
             };
-            this.sR.getElementById("pgNumeric").max = ((this.table.itemPage.length/this.table.pageSize) % 1 > 0.5) ? parseInt(this.table.itemPage.length/this.table.pageSize) : ((this.table.itemPage.length/this.table.pageSize) % 1 == 0) ? this.table.itemPage.length/this.table.pageSize : parseInt(this.table.itemPage.length/this.table.pageSize)+1;
+            let x = this.table.numberOfRegistrys / this.table.pageSize;
+            let lastPage = (x % 1 == 0) ? x : Math.floor(x) + 1; 
+            this.sR.getElementById("pgNumeric").max = lastPage;
             this.table.itemPage.push(newObj);
             this.table.registrys.push(newObj);
-            this.movePage(this.sR.getElementById("pgNumeric").max-1);
+            this.movePage(lastPage - 1);
             let row = this.table.sR.getElementById(`r${this.table.numberOfRegistrys-1}`);
+            row.onclick = e => {
+                this.selectRow(row);
+            }
             this.selectRow(row);
-        })
-        buttons[7].addEventListener("click",(e) => {
+        }
+        const deleteRegister = e => {
             this.table.itemPage.splice(this.table.selectedRow, 1);
             this.table.numberOfRegistrys--;
-            console.log(this.table.itemPage)
-            for (let i = 0; i < this.table.itemPage.length; i++) {
+            for (let i = 0; i < this.table.numberOfRegistrys; i++) {
                 const register = this.table.itemPage[i];
                 register.registryPos = i;
             }  
-            for (let i = this.table.pageSize; i > 0; i--) {
-                this.table.sR.getElementById("tableBody").childNodes[i].remove();
+            let y = this.table.sR.getElementById("tableBody").childNodes;
+            for (let i = y.length-1; i > 0; i--) {
+                y[i].remove();
+                
             }
             this.table.createTable(this.table.sR.getElementById("tableBody"));
-            this.movePage(this.table.currentPage);
-            this.sR.getElementById("pgNumeric").max = ((this.table.itemPage.length/this.table.pageSize) % 1 > 0.5) ? parseInt(this.table.itemPage.length/this.table.pageSize) : ((this.table.itemPage.length/this.table.pageSize) % 1 == 0) ? this.table.itemPage.length/this.table.pageSize : parseInt(this.table.itemPage.length/this.table.pageSize)+1;
+            this.movePage(this.table.currentPage)
+            if(y.length == 1){
+                this.movePage(--this.table.currentPage);
+            }
+            let x = this.table.numberOfRegistrys / this.table.pageSize;
+            this.sR.getElementById("pgNumeric").max = (x % 1 == 0) ? x : Math.floor(x) + 1; ;
+        }
+        buttons[0].addEventListener("click", moveToFirstPage);
+        buttons[1].addEventListener("click", moveToPrevPage);    
+        buttons[2].addEventListener("click", prevRegister);
+        buttons[3].addEventListener("click", nextRegister);
+        buttons[4].addEventListener("click", moveToNextPage);
+        buttons[5].addEventListener("click", moveToLastPage);
+        buttons[6].addEventListener("click", addRegister);
+        buttons[7].addEventListener("click", deleteRegister);
+        window.addEventListener("keydown", e => {
+            if (e.code == "Home") {
+                moveToFirstPage(e);
+            }
+            else if (e.code == "PageUp") {
+                moveToPrevPage(e);
+            }
+            else if (e.code == "ArrowUp") {
+                prevRegister(e);
+            }
+            else if (e.code == "ArrowDown") {
+                nextRegister(e);
+            }
+            else if (e.code == "PageDown") {
+                moveToNextPage(e);
+            }
+            else if (e.code == "End") {
+                moveToLastPage(e);
+            }
+            else if (e.code == "Insert") {
+                addRegister(e);
+            }
+            else if (e.code == "Delete") {
+                deleteRegister(e);
+            }
         })
         for (const key in this.table.registrys) {     
             let register = this.table.registrys[key];
@@ -302,7 +349,7 @@ class Controls extends HTMLElement{
                 break;
             }
             let row = this.table.sR.getElementById(`r${register.registryPos}`);     
-            row.addEventListener("click",(e)=>{
+            row.addEventListener("click", e =>{
                 this.selectRow(row);
             });   
         }  
@@ -329,7 +376,6 @@ class Controls extends HTMLElement{
         this.table.currentPage = pageNmbr;
         this.sR.getElementById("pgNumeric").value = this.table.currentPage + 1;   
         var slice = this.table.itemPage.slice(pageNmbr*this.table.pageSize,pageNmbr*this.table.pageSize + this.table.pageSize);
-        console.log(slice)
         slice.forEach(register => {
             const tr = document.createElement("tr");
             tr.id = "r"+register.registryPos;
@@ -339,7 +385,7 @@ class Controls extends HTMLElement{
                     const ta = document.createElement("textarea");
                     ta.innerHTML = register[data];
                     ta.classList.add(`${data}cell`)
-                    ta.addEventListener("change",(e) => {
+                    ta.addEventListener("change", e => {
                         const registryNumbr = ta.parentElement.parentElement.id.substring(1);
                         var obj = search(this.table.registrys, registryNumbr);
                         if(ta.className == "cicell"){
@@ -368,7 +414,7 @@ class Controls extends HTMLElement{
                 break;
             }
             let row = this.table.sR.getElementById(`r${register.registryPos}`);
-            row.onclick = (e)=>{
+            row.onclick = e =>{
                 this.selectRow(row);  
             } 
         }
@@ -430,7 +476,7 @@ class Grid extends HTMLElement {
         const title = document.createElement("h1");
         title.classList.add("title");
         title.textContent = this.title;
-        const moveDiv = (e)=>{
+        const moveDiv = e =>{
             e = e || window.event;
             e.preventDefault();
             var newY = oldY - e.clientY;
@@ -441,12 +487,12 @@ class Grid extends HTMLElement {
             this.style.left = (this.offsetLeft - newX) + "px";
         }
 
-        const dragOff = ()=>{
+        const dragOff = () =>{
             title.removeEventListener("mousemove", moveDiv);
             title.removeEventListener("mouseup", dragOff);
             document.body.removeEventListener("mousemove", moveDiv);
         }
-        const dragOn = (e)=>{
+        const dragOn = e =>{
             e = e || window.event;
             e.preventDefault();
             oldY = e.clientY;
@@ -513,12 +559,15 @@ class Grid extends HTMLElement {
         srchField.style.left = "20px";  
         srchField.addEventListener("change", e => {
             let register = searchRegistry(this.registrys, parseInt(srchField.value));
-            let page = (register.registryPos + 1) / this.pageSize;  
-            page = (page % 1 != 0 && page % 1 < 0.5) ? Math.round(page) + 1 : Math.round(page); 
-            controlsTag.movePage(page-1);
-            console.log(page);
-            let row = this.sR.getElementById(`r${register.registryPos}`);
-            controlsTag.selectRow(row);
+            if (register != null) {
+                let page = (register.registryPos + 1) / this.pageSize;  
+                page = (page % 1 != 0 && page % 1 < 0.5) ? Math.round(page) + 1 : Math.round(page); 
+                controlsTag.movePage(page-1);
+                console.log(page);
+                let row = this.sR.getElementById(`r${register.registryPos}`);
+                console.log(row);
+                controlsTag.selectRow(row);
+            }   
         })    
         for (const column in this.headers) {
             let th = this.sR.getElementById(column);
